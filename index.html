@@ -4,237 +4,876 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Rhythm Card Maker</title>
+<title>Rhythm Gacha Card Maker</title>
 
 <style>
 * {
-  box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+:root {
+    --main: #6c63ff;
+    --sub: #9d96ff;
+    --bg: #f5f5fa;
+    --text: #202024;
 }
 
 body {
-  margin: 0;
-  padding: 20px;
-  background: #eeeeee;
-  font-family: Arial, sans-serif;
-  color: #333;
+    margin: 0;
+    background:
+        radial-gradient(circle at 20% 10%, #ffffff 0, transparent 30%),
+        radial-gradient(circle at 90% 20%, #e7e5ff 0, transparent 30%),
+        var(--bg);
+    color: var(--text);
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Noto Sans KR",
+        sans-serif;
 }
 
-h1 {
-  text-align: center;
-  margin-bottom: 25px;
+header {
+    padding: 35px 20px 25px;
+    text-align: center;
+}
+
+.logo {
+    font-size: 14px;
+    letter-spacing: 4px;
+    color: #777;
+    margin-bottom: 7px;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 30px;
+    letter-spacing: -1px;
+}
+
+header p {
+    margin: 10px 0 0;
+    color: #777;
+    font-size: 14px;
 }
 
 .container {
-  max-width: 900px;
-  margin: auto;
+    width: min(100%, 1050px);
+    margin: auto;
+    padding: 0 18px 60px;
 }
 
 .editor {
-  background: white;
-  padding: 20px;
-  border-radius: 18px;
-  margin-bottom: 25px;
+    background: rgba(255,255,255,.92);
+    border: 1px solid #e4e4ea;
+    border-radius: 28px;
+    padding: 24px;
+    box-shadow: 0 20px 50px rgba(40,40,80,.08);
+}
+
+.section-title {
+    font-size: 18px;
+    font-weight: 800;
+    margin: 5px 0 18px;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+.field {
+    margin-bottom: 15px;
+}
+
+.field.full {
+    grid-column: 1 / -1;
 }
 
 label {
-  display: block;
-  margin-top: 15px;
-  margin-bottom: 6px;
-  font-weight: bold;
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 700;
+    font-size: 14px;
 }
 
 input,
-select,
-button {
-  width: 100%;
-  padding: 12px;
-  border-radius: 10px;
-  border: 1px solid #ccc;
-  font-size: 16px;
+textarea,
+select {
+    width: 100%;
+    border: 1px solid #dddde5;
+    background: #fafafd;
+    border-radius: 14px;
+    padding: 14px;
+    font-size: 15px;
+    outline: none;
+    transition: .2s;
+    font-family: inherit;
 }
 
-input[type="file"] {
-  background: white;
+textarea {
+    min-height: 90px;
+    resize: vertical;
 }
 
-button {
-  margin-top: 20px;
-  background: #333;
-  color: white;
-  border: none;
-  cursor: pointer;
+input:focus,
+textarea:focus,
+select:focus {
+    border-color: var(--main);
+    box-shadow: 0 0 0 4px rgba(108,99,255,.10);
+}
+
+.rarity-buttons {
+    display: flex;
+    gap: 8px;
+}
+
+.rarity-buttons button {
+    flex: 1;
+    border: 1px solid #ddd;
+    background: white;
+    border-radius: 12px;
+    padding: 11px 4px;
+    font-size: 18px;
+    cursor: pointer;
+}
+
+.rarity-buttons button.active {
+    background: #24242b;
+    color: white;
+    border-color: #24242b;
+}
+
+.image-upload {
+    border: 2px dashed #d7d7e0;
+    border-radius: 18px;
+    padding: 24px;
+    text-align: center;
+    cursor: pointer;
+    background: #fafafd;
+}
+
+.image-upload:hover {
+    border-color: var(--main);
+}
+
+.image-upload input {
+    display: none;
+}
+
+.upload-icon {
+    font-size: 30px;
+}
+
+.upload-text {
+    margin-top: 8px;
+    color: #777;
+    font-size: 13px;
+}
+
+#imageName {
+    margin-top: 8px;
+    color: var(--main);
+    font-size: 12px;
+}
+
+.generate {
+    width: 100%;
+    border: 0;
+    border-radius: 16px;
+    padding: 17px;
+    background: linear-gradient(135deg, #27272d, #555563);
+    color: white;
+    font-size: 17px;
+    font-weight: 800;
+    cursor: pointer;
+    margin-top: 8px;
+    box-shadow: 0 10px 25px rgba(0,0,0,.15);
+}
+
+.generate:active {
+    transform: scale(.98);
 }
 
 .preview-area {
-  display: flex;
-  justify-content: center;
+    margin-top: 35px;
+    text-align: center;
+}
+
+.preview-title {
+    font-size: 18px;
+    font-weight: 800;
+    margin-bottom: 16px;
 }
 
 .card {
-  width: 300px;
-  height: 420px;
-  position: relative;
-  overflow: hidden;
-  border-radius: 18px;
-  background: linear-gradient(135deg, #ddd, #888);
-  box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+    position: relative;
+    width: min(100%, 390px);
+    aspect-ratio: 0.70;
+    margin: auto;
+    overflow: hidden;
+    border-radius: 24px;
+    background: linear-gradient(145deg,#d7d7dc,#8f8f97);
+    box-shadow:
+        0 25px 60px rgba(30,30,50,.28),
+        inset 0 0 0 2px rgba(255,255,255,.7);
+    color: white;
 }
 
 .card-image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+    position: absolute;
+    inset: 0;
+    background:
+        linear-gradient(
+            to bottom,
+            rgba(0,0,0,0) 40%,
+            rgba(0,0,0,.15) 55%,
+            rgba(0,0,0,.92) 100%
+        );
+    background-size: cover;
+    background-position: center;
 }
 
-.card-info {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  padding: 25px 15px 18px;
-  color: white;
-  background: linear-gradient(
-    transparent,
-    rgba(0,0,0,0.85)
-  );
+.card::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(circle at 20% 15%, rgba(255,255,255,.55), transparent 2%),
+        radial-gradient(circle at 80% 25%, rgba(255,255,255,.45), transparent 2%),
+        linear-gradient(135deg, transparent 55%, rgba(255,255,255,.15));
+    pointer-events: none;
 }
 
-.rarity {
-  font-size: 20px;
-  margin-bottom: 5px;
+.card-content {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 22px;
+    text-align: left;
 }
 
-.card-name {
-  font-size: 25px;
-  font-weight: bold;
+.stars {
+    font-size: 23px;
+    letter-spacing: 2px;
+    margin-bottom: 8px;
+    text-shadow: 0 2px 8px rgba(0,0,0,.5);
 }
 
-.character-name {
-  font-size: 15px;
-  margin-top: 5px;
+.attribute {
+    position: absolute;
+    top: 18px;
+    right: 18px;
+    padding: 7px 12px;
+    border-radius: 30px;
+    font-size: 12px;
+    font-weight: 800;
+    background: rgba(255,255,255,.18);
+    border: 1px solid rgba(255,255,255,.5);
+    backdrop-filter: blur(8px);
 }
 
-.empty {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-  color: white;
-  font-size: 18px;
+.card-title {
+    font-size: 27px;
+    font-weight: 900;
+    line-height: 1.15;
+    text-shadow: 0 3px 10px rgba(0,0,0,.55);
+}
+
+.character {
+    margin-top: 7px;
+    font-size: 16px;
+    font-weight: 600;
+    opacity: .9;
+}
+
+.skill-box {
+    margin-top: 14px;
+    padding: 12px;
+    border-radius: 13px;
+    background: rgba(0,0,0,.28);
+    backdrop-filter: blur(8px);
+}
+
+.skill-name {
+    font-size: 12px;
+    font-weight: 900;
+    letter-spacing: 1px;
+}
+
+.skill-desc {
+    margin-top: 4px;
+    font-size: 11px;
+    opacity: .9;
+    line-height: 1.4;
+}
+
+.empty-image {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 700;
+    font-size: 18px;
+}
+
+.dialogue {
+    width: min(100%, 390px);
+    margin: 18px auto 0;
+    padding: 17px 18px;
+    background: white;
+    border-radius: 17px;
+    text-align: left;
+    box-shadow: 0 10px 30px rgba(30,30,50,.08);
+}
+
+.dialogue-label {
+    font-size: 11px;
+    color: var(--main);
+    font-weight: 900;
+    letter-spacing: 2px;
+}
+
+.dialogue-text {
+    margin-top: 7px;
+    font-size: 15px;
+    line-height: 1.5;
+    font-weight: 700;
+}
+
+.gacha-button {
+    width: min(100%, 390px);
+    margin: 16px auto 0;
+    display: block;
+    border: 0;
+    border-radius: 15px;
+    padding: 15px;
+    background: linear-gradient(135deg,#766cff,#a49eff);
+    color: white;
+    font-weight: 900;
+    font-size: 16px;
+    cursor: pointer;
+    box-shadow: 0 12px 30px rgba(108,99,255,.25);
+}
+
+.gacha-overlay {
+    position: fixed;
+    z-index: 100;
+    inset: 0;
+    background:
+        radial-gradient(circle at center, #7770ff, #17172c 65%);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.gacha-overlay.show {
+    display: flex;
+    animation: fadeIn .3s;
+}
+
+.gacha-content {
+    text-align: center;
+    color: white;
+    width: 90%;
+}
+
+.gacha-stars {
+    font-size: 30px;
+    letter-spacing: 4px;
+    margin-bottom: 25px;
+    animation: sparkle 1s infinite alternate;
+}
+
+.gacha-rarity {
+    font-size: 58px;
+    font-weight: 1000;
+    text-shadow: 0 0 30px white;
+    animation: pop .8s;
+}
+
+.gacha-line {
+    width: 0;
+    height: 2px;
+    background: white;
+    margin: 22px auto;
+    animation: line 1s forwards;
+}
+
+.gacha-character {
+    font-size: 24px;
+    font-weight: 900;
+    opacity: 0;
+    animation: dialogueIn .7s 1s forwards;
+}
+
+.gacha-dialogue {
+    margin-top: 13px;
+    font-size: 16px;
+    line-height: 1.6;
+    opacity: 0;
+    animation: dialogueIn .7s 1.3s forwards;
+}
+
+.close-gacha {
+    margin-top: 30px;
+    border: 1px solid rgba(255,255,255,.6);
+    background: rgba(255,255,255,.12);
+    color: white;
+    border-radius: 30px;
+    padding: 12px 24px;
+    cursor: pointer;
+    opacity: 0;
+    animation: dialogueIn .7s 1.7s forwards;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes pop {
+    0% { transform: scale(.2); opacity: 0; }
+    70% { transform: scale(1.15); opacity: 1; }
+    100% { transform: scale(1); }
+}
+
+@keyframes sparkle {
+    from { transform: scale(1); opacity: .7; }
+    to { transform: scale(1.08); opacity: 1; }
+}
+
+@keyframes line {
+    to { width: 220px; }
+}
+
+@keyframes dialogueIn {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media (max-width: 650px) {
+    .grid {
+        grid-template-columns: 1fr;
+    }
+
+    .field.full {
+        grid-column: auto;
+    }
+
+    .editor {
+        padding: 19px;
+        border-radius: 22px;
+    }
+
+    header h1 {
+        font-size: 25px;
+    }
 }
 </style>
 </head>
 
 <body>
 
+<header>
+    <div class="logo">RHYTHM • GACHA • CARD</div>
+    <h1>✦ CARD MAKER ✦</h1>
+    <p>나만의 리듬게임 카드를 만들어보세요.</p>
+</header>
+
 <div class="container">
 
-<h1>🎵 Rhythm Card Maker</h1>
+    <section class="editor">
 
-<div class="editor">
+        <div class="section-title">CARD INFORMATION</div>
 
-<label>카드 이미지</label>
-<input type="file" id="imageInput" accept="image/*">
+        <div class="grid">
 
-<label>카드 이름</label>
-<input type="text" id="cardName" placeholder="예: 별빛 아래의 약속">
+            <div class="field">
+                <label>카드 이름</label>
+                <input id="cardTitle" value="별빛 너머의 꿈"
+                       placeholder="카드 제목을 입력하세요">
+            </div>
 
-<label>캐릭터 이름</label>
-<input type="text" id="characterName" placeholder="예: ○○○">
+            <div class="field">
+                <label>캐릭터 이름</label>
+                <input id="characterName" value="카를레나"
+                       placeholder="캐릭터 이름">
+            </div>
 
-<label>등급</label>
-<select id="rarity">
-  <option value="★">★</option>
-  <option value="★★">★★</option>
-  <option value="★★★">★★★</option>
-  <option value="★★★★">★★★★</option>
-  <option value="★★★★★">★★★★★</option>
-</select>
+            <div class="field">
+                <label>속성</label>
+                <select id="attribute">
+                    <option>큐트</option>
+                    <option>쿨</option>
+                    <option>해피</option>
+                    <option>미스틱</option>
+                    <option>플레임</option>
+                </select>
+            </div>
 
-<button onclick="updateCard()">카드 만들기</button>
+            <div class="field">
+                <label>등급</label>
+
+                <div class="rarity-buttons">
+                    <button data-rarity="1">★</button>
+                    <button data-rarity="2">★★</button>
+                    <button data-rarity="3">★★★</button>
+                    <button data-rarity="4">★★★★</button>
+                    <button data-rarity="5" class="active">★★★★★</button>
+                </div>
+
+            </div>
+
+            <div class="field full">
+                <label>카드 이미지</label>
+
+                <label class="image-upload">
+                    <input type="file" id="imageInput" accept="image/*">
+
+                    <div class="upload-icon">🖼️</div>
+                    <div>이미지를 선택해주세요</div>
+                    <div class="upload-text">
+                        휴대폰에 저장된 캐릭터 이미지를 사용할 수 있어요.
+                    </div>
+
+                    <div id="imageName"></div>
+                </label>
+            </div>
+
+            <div class="field full">
+                <label>가챠 등장 대사</label>
+
+                <textarea id="dialogue"
+                    placeholder="가챠에서 이 캐릭터가 등장하며 할 말을 입력하세요.">이런 순간을 기다리고 있었어. 자, 같이 가자!</textarea>
+            </div>
+
+            <div class="field">
+                <label>스킬 이름</label>
+                <input id="skillName"
+                       value="별빛의 노래"
+                       placeholder="스킬 이름">
+            </div>
+
+            <div class="field">
+                <label>스킬 설명</label>
+                <input id="skillDesc"
+                       value="라이프를 회복하고 일정 시간 판정을 강화한다."
+                       placeholder="스킬 설명">
+            </div>
+
+        </div>
+
+        <button class="generate" onclick="makeCard()">
+            ✦ 카드 만들기
+        </button>
+
+    </section>
+
+
+    <section class="preview-area">
+
+        <div class="preview-title">
+            CARD PREVIEW
+        </div>
+
+        <div class="card" id="card">
+
+            <div class="card-image" id="cardImage"></div>
+
+            <div class="empty-image" id="emptyImage">
+                이미지를 넣어주세요
+            </div>
+
+            <div class="attribute" id="cardAttribute">
+                큐트
+            </div>
+
+            <div class="card-content">
+
+                <div class="stars" id="cardStars">
+                    ★★★★★
+                </div>
+
+                <div class="card-title" id="previewTitle">
+                    별빛 너머의 꿈
+                </div>
+
+                <div class="character" id="previewCharacter">
+                    카를레나
+                </div>
+
+                <div class="skill-box">
+
+                    <div class="skill-name" id="previewSkill">
+                        별빛의 노래
+                    </div>
+
+                    <div class="skill-desc" id="previewSkillDesc">
+                        라이프를 회복하고 일정 시간 판정을 강화한다.
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="dialogue">
+
+            <div class="dialogue-label">
+                GACHA VOICE
+            </div>
+
+            <div class="dialogue-text" id="previewDialogue">
+                "이런 순간을 기다리고 있었어. 자, 같이 가자!"
+            </div>
+
+        </div>
+
+
+        <button class="gacha-button" onclick="startGacha()">
+            ✦ 가챠 연출 보기
+        </button>
+
+    </section>
 
 </div>
 
-<div class="preview-area">
 
-<div class="card">
+<div class="gacha-overlay" id="gachaOverlay">
 
-  <img id="cardImage" class="card-image" style="display:none;">
+    <div class="gacha-content">
 
-  <div id="emptyText" class="empty">
-    이미지를 넣어주세요
-  </div>
+        <div class="gacha-stars" id="gachaStars">
+            ★★★★★
+        </div>
 
-  <div class="card-info">
+        <div class="gacha-rarity" id="gachaRarity">
+            5 STAR
+        </div>
 
-    <div id="rarityText" class="rarity">
-      ★
+        <div class="gacha-line"></div>
+
+        <div class="gacha-character" id="gachaCharacter">
+            카를레나
+        </div>
+
+        <div class="gacha-dialogue" id="gachaDialogue">
+            "이런 순간을 기다리고 있었어. 자, 같이 가자!"
+        </div>
+
+        <button class="close-gacha" onclick="closeGacha()">
+            카드 확인하기
+        </button>
+
     </div>
 
-    <div id="cardNameText" class="card-name">
-      카드 이름
-    </div>
-
-    <div id="characterNameText" class="character-name">
-      캐릭터 이름
-    </div>
-
-  </div>
-
 </div>
 
-</div>
-
-</div>
 
 <script>
 
-const imageInput = document.getElementById("imageInput");
+let selectedRarity = 5;
+let uploadedImage = "";
 
-imageInput.addEventListener("change", function() {
 
-  const file = this.files[0];
+/* 등급 선택 */
 
-  if (!file) return;
+document.querySelectorAll(".rarity-buttons button").forEach(button => {
 
-  const reader = new FileReader();
+    button.addEventListener("click", () => {
 
-  reader.onload = function(e) {
+        document.querySelectorAll(".rarity-buttons button")
+            .forEach(b => b.classList.remove("active"));
 
-    const image = document.getElementById("cardImage");
+        button.classList.add("active");
 
-    image.src = e.target.result;
-    image.style.display = "block";
+        selectedRarity = Number(button.dataset.rarity);
 
-    document.getElementById("emptyText").style.display = "none";
-
-  };
-
-  reader.readAsDataURL(file);
+        makeCard();
+    });
 
 });
 
-function updateCard() {
 
-  const cardName =
-    document.getElementById("cardName").value;
+/* 이미지 업로드 */
 
-  const characterName =
-    document.getElementById("characterName").value;
+document.getElementById("imageInput").addEventListener("change", function(e) {
 
-  const rarity =
-    document.getElementById("rarity").value;
+    const file = e.target.files[0];
 
-  document.getElementById("cardNameText").textContent =
-    cardName || "카드 이름";
+    if (!file) return;
 
-  document.getElementById("characterNameText").textContent =
-    characterName || "캐릭터 이름";
+    document.getElementById("imageName").textContent =
+        "선택됨: " + file.name;
 
-  document.getElementById("rarityText").textContent =
-    rarity;
+    const reader = new FileReader();
+
+    reader.onload = function(event) {
+
+        uploadedImage = event.target.result;
+
+        document.getElementById("cardImage").style.backgroundImage =
+            `url("${uploadedImage}")`;
+
+        document.getElementById("emptyImage").style.display =
+            "none";
+    };
+
+    reader.readAsDataURL(file);
+
+});
+
+
+/* 카드 만들기 */
+
+function makeCard() {
+
+    const title =
+        document.getElementById("cardTitle").value ||
+        "이름 없는 카드";
+
+    const character =
+        document.getElementById("characterName").value ||
+        "Unknown";
+
+    const attribute =
+        document.getElementById("attribute").value;
+
+    const dialogue =
+        document.getElementById("dialogue").value ||
+        "...";
+
+    const skill =
+        document.getElementById("skillName").value ||
+        "스킬";
+
+    const skillDesc =
+        document.getElementById("skillDesc").value ||
+        "스킬 설명";
+
+    document.getElementById("previewTitle").textContent =
+        title;
+
+    document.getElementById("previewCharacter").textContent =
+        character;
+
+    document.getElementById("cardAttribute").textContent =
+        attribute;
+
+    document.getElementById("cardStars").textContent =
+        "★".repeat(selectedRarity);
+
+    document.getElementById("previewDialogue").textContent =
+        `"${dialogue}"`;
+
+    document.getElementById("previewSkill").textContent =
+        skill;
+
+    document.getElementById("previewSkillDesc").textContent =
+        skillDesc;
+
+    updateTheme();
 
 }
+
+
+/* 등급별 분위기 */
+
+function updateTheme() {
+
+    const card = document.getElementById("card");
+
+    if (selectedRarity === 5) {
+
+        card.style.boxShadow =
+            "0 25px 70px rgba(108,99,255,.45), inset 0 0 0 2px rgba(255,255,255,.8)";
+
+    } else if (selectedRarity === 4) {
+
+        card.style.boxShadow =
+            "0 25px 60px rgba(255,190,80,.35), inset 0 0 0 2px rgba(255,255,255,.7)";
+
+    } else if (selectedRarity === 3) {
+
+        card.style.boxShadow =
+            "0 25px 55px rgba(80,160,255,.3), inset 0 0 0 2px rgba(255,255,255,.7)";
+
+    } else {
+
+        card.style.boxShadow =
+            "0 25px 50px rgba(30,30,50,.25), inset 0 0 0 2px rgba(255,255,255,.7)";
+    }
+
+}
+
+
+/* 가챠 연출 */
+
+function startGacha() {
+
+    makeCard();
+
+    const title =
+        document.getElementById("cardTitle").value ||
+        "이름 없는 카드";
+
+    const character =
+        document.getElementById("characterName").value ||
+        "Unknown";
+
+    const dialogue =
+        document.getElementById("dialogue").value ||
+        "...";
+
+    document.getElementById("gachaStars").textContent =
+        "★".repeat(selectedRarity);
+
+    document.getElementById("gachaRarity").textContent =
+        selectedRarity + " STAR";
+
+    document.getElementById("gachaCharacter").textContent =
+        character;
+
+    document.getElementById("gachaDialogue").textContent =
+        `"${dialogue}"`;
+
+    const overlay =
+        document.getElementById("gachaOverlay");
+
+    overlay.classList.remove("show");
+
+    void overlay.offsetWidth;
+
+    overlay.classList.add("show");
+
+}
+
+
+function closeGacha() {
+
+    document
+        .getElementById("gachaOverlay")
+        .classList.remove("show");
+
+}
+
+
+makeCard();
 
 </script>
 
